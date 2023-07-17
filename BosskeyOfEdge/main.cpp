@@ -13,11 +13,60 @@
 
 using namespace std;
 
+string GetUserDocumentsPath()
+{
+    char* documentsPath;
+    string path;
+
+#ifdef _WIN32
+    size_t requiredSize;
+    getenv_s(&requiredSize, nullptr, 0, "USERPROFILE");
+    if (requiredSize > 0)
+    {
+        documentsPath = new char[requiredSize];
+        getenv_s(&requiredSize, documentsPath, requiredSize, "USERPROFILE");
+        path = documentsPath;
+        path += "\\Documents\\";
+        delete[] documentsPath;
+    }
+#else
+    documentsPath = getenv("HOME");
+    if (documentsPath != nullptr)
+    {
+        path = documentsPath;
+        path += "/Documents/";
+    }
+#endif
+
+    return path;
+}
+
+// 存储最大化状态到用户文档目录中的文件
+void StoreWindowState(bool isMaximized) {
+    std::string filePath = GetUserDocumentsPath() + "window_state.txt";
+    std::ofstream file(filePath);
+    if (file.is_open()) {
+        file << (isMaximized ? "1" : "0") << " " << (isMaximized ? "1" : "0");
+        file.close();
+    }
+}
+
+// 从用户文档目录中的文件中读取最大化状态和隐藏状态
+bool ReadWindowState() {
+    std::string filePath = GetUserDocumentsPath() + "window_state.txt";
+    std::ifstream file(filePath);
+    if (file.is_open()) {
+        bool isMaximized;
+        file >> isMaximized;
+        file.close();
+        return (isMaximized == 1);
+    }
+    return false;
+}
+
 //隐藏或者显示窗口
 void ShowOrHideWindow(HWND hWnd)
 {
-
-
     wstring targetClassName = L"Chrome_WidgetWin_1";  // 目标窗口类名,这里为Edge的主界面类名，增强判定
 
     // 获取窗口类名
@@ -28,89 +77,111 @@ void ShowOrHideWindow(HWND hWnd)
     wstring currentClassName = className;
     if (currentClassName == targetClassName)
     {
-        if (IsWindowVisible(hWnd) && GetWindowLong(hWnd, GWL_STYLE) & WS_VISIBLE)
+        char title[MAX_PATH];
+        if (GetWindowTextA(hWnd, title, MAX_PATH) > 0)
         {
-            // 隐藏窗口
-            ShowWindow(hWnd, SW_HIDE);
-
-            // 窗口静音
-            LPCWSTR executableName = L"nircmd.exe";
-            LPCWSTR parameters = L"muteappvolume msedge.exe 1";// 1表示静音，0表示取消静音
-
-            WCHAR executablePath[MAX_PATH];
-            WCHAR programPath[MAX_PATH];
-
-            // 获取当前程序的目录路径
-            GetModuleFileName(NULL, programPath, MAX_PATH);
-            PathRemoveFileSpec(programPath);
-
-            // 设置当前目录为程序的目录路径
-            SetCurrentDirectory(programPath);
-
-            // 使用相对路径获取可执行文件的位置
-            wcscpy_s(executablePath, MAX_PATH, executableName);
-
-            SHELLEXECUTEINFO shellExecuteInfo = { 0 };
-            shellExecuteInfo.cbSize = sizeof(SHELLEXECUTEINFO);
-            shellExecuteInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
-            shellExecuteInfo.lpVerb = L"open";
-            shellExecuteInfo.lpFile = executablePath;
-            shellExecuteInfo.lpParameters = parameters;
-            shellExecuteInfo.nShow = SW_HIDE;  // 隐藏窗口
-
-            if (ShellExecuteEx(&shellExecuteInfo))
+            if (strcmp(title, "画中画") != 0)
             {
-                // 等待命令行进程执行完毕
-                WaitForSingleObject(shellExecuteInfo.hProcess, INFINITE);
-                CloseHandle(shellExecuteInfo.hProcess);
+                if (IsWindowVisible(hWnd) && GetWindowLong(hWnd, GWL_STYLE) & WS_VISIBLE)
+                {
+                    StoreWindowState(IsZoomed(hWnd));
+                    // 隐藏窗口
+                    ShowWindow(hWnd, SW_HIDE);
+
+                    // 窗口静音
+                    LPCWSTR executableName = L"nircmd.exe";
+                    LPCWSTR parameters = L"muteappvolume msedge.exe 1";// 1表示静音，0表示取消静音
+
+                    WCHAR executablePath[MAX_PATH];
+                    WCHAR programPath[MAX_PATH];
+
+                    // 获取当前程序的目录路径
+                    GetModuleFileName(NULL, programPath, MAX_PATH);
+                    PathRemoveFileSpec(programPath);
+
+                    // 设置当前目录为程序的目录路径
+                    SetCurrentDirectory(programPath);
+
+                    // 使用相对路径获取可执行文件的位置
+                    wcscpy_s(executablePath, MAX_PATH, executableName);
+
+                    SHELLEXECUTEINFO shellExecuteInfo = { 0 };
+                    shellExecuteInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+                    shellExecuteInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
+                    shellExecuteInfo.lpVerb = L"open";
+                    shellExecuteInfo.lpFile = executablePath;
+                    shellExecuteInfo.lpParameters = parameters;
+                    shellExecuteInfo.nShow = SW_HIDE;  // 隐藏窗口
+
+                    if (ShellExecuteEx(&shellExecuteInfo))
+                    {
+                        // 等待命令行进程执行完毕
+                        WaitForSingleObject(shellExecuteInfo.hProcess, INFINITE);
+                        CloseHandle(shellExecuteInfo.hProcess);
+                    }
+                    else
+                    {
+                        // 执行命令行失败
+                        MessageBox(NULL, L"无法执行命令行", L"错误", MB_ICONERROR | MB_OK);
+                    }
+                }
+                else
+                {
+                    // 显示窗口
+                    if (ReadWindowState())
+                    {
+                        ShowWindow(hWnd, SW_MAXIMIZE);
+                    }
+                    else
+                    {
+                        ShowWindow(hWnd, SW_SHOW);
+                    }
+                    
+                  
+                    // 窗口取消静音
+                    LPCWSTR executableName = L"nircmd.exe";
+                    LPCWSTR parameters = L"muteappvolume msedge.exe 0";
+
+                    WCHAR executablePath[MAX_PATH];
+                    WCHAR programPath[MAX_PATH];
+
+                    // 获取当前程序的目录路径
+                    GetModuleFileName(NULL, programPath, MAX_PATH);
+                    PathRemoveFileSpec(programPath);
+
+                    // 设置当前目录为程序的目录路径
+                    SetCurrentDirectory(programPath);
+
+                    // 使用相对路径获取可执行文件的位置
+                    wcscpy_s(executablePath, MAX_PATH, executableName);
+
+                    SHELLEXECUTEINFO shellExecuteInfo = { 0 };
+                    shellExecuteInfo.cbSize = sizeof(SHELLEXECUTEINFO);
+                    shellExecuteInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
+                    shellExecuteInfo.lpVerb = L"open";
+                    shellExecuteInfo.lpFile = executablePath;
+                    shellExecuteInfo.lpParameters = parameters;
+                    shellExecuteInfo.nShow = SW_HIDE;  // 隐藏窗口
+
+                    if (ShellExecuteEx(&shellExecuteInfo))
+                    {
+                        // 等待命令行进程执行完毕
+                        WaitForSingleObject(shellExecuteInfo.hProcess, INFINITE);
+                        CloseHandle(shellExecuteInfo.hProcess);
+                    }
+                    else
+                    {
+                        // 执行命令行失败
+                        MessageBox(NULL, L"无法执行命令行", L"错误", MB_ICONERROR | MB_OK);
+                    }
+                }
             }
             else
             {
-                // 执行命令行失败
-                MessageBox(NULL, L"无法执行命令行", L"错误", MB_ICONERROR | MB_OK);
+                // 发送关闭消息
+                PostMessage(hWnd, WM_CLOSE, 0, 0);
             }
-        }
-        else
-        {
-            // 显示窗口
-            ShowWindow(hWnd, SW_SHOW);
-
-            // 窗口取消静音
-            LPCWSTR executableName = L"nircmd.exe";
-            LPCWSTR parameters = L"muteappvolume msedge.exe 0";
-
-            WCHAR executablePath[MAX_PATH];
-            WCHAR programPath[MAX_PATH];
-
-            // 获取当前程序的目录路径
-            GetModuleFileName(NULL, programPath, MAX_PATH);
-            PathRemoveFileSpec(programPath);
-
-            // 设置当前目录为程序的目录路径
-            SetCurrentDirectory(programPath);
-
-            // 使用相对路径获取可执行文件的位置
-            wcscpy_s(executablePath, MAX_PATH, executableName);
-
-            SHELLEXECUTEINFO shellExecuteInfo = { 0 };
-            shellExecuteInfo.cbSize = sizeof(SHELLEXECUTEINFO);
-            shellExecuteInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
-            shellExecuteInfo.lpVerb = L"open";
-            shellExecuteInfo.lpFile = executablePath;
-            shellExecuteInfo.lpParameters = parameters;
-            shellExecuteInfo.nShow = SW_HIDE;  // 隐藏窗口
-
-            if (ShellExecuteEx(&shellExecuteInfo))
-            {
-                // 等待命令行进程执行完毕
-                WaitForSingleObject(shellExecuteInfo.hProcess, INFINITE);
-                CloseHandle(shellExecuteInfo.hProcess);
-            }
-            else
-            {
-                // 执行命令行失败
-                MessageBox(NULL, L"无法执行命令行", L"错误", MB_ICONERROR | MB_OK);
-            }
+            
         }
     }
 }
