@@ -46,7 +46,7 @@ void StoreWindowState(bool isMaximized) {
     std::string filePath = GetUserDocumentsPath() + "window_state.txt";
     std::ofstream file(filePath);
     if (file.is_open()) {
-        file << (isMaximized ? "1" : "0") << " " << (isMaximized ? "1" : "0");
+        file << (isMaximized ? "1" : "0") ;
         file.close();
     }
 }
