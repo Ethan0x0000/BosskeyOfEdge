@@ -13,10 +13,33 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="源文件\Function">
+      <UniqueIdentifier>{98a8ec5d-6003-41c2-b090-be28db77a6af}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="BossKey.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="GetListByName.cpp">
+      <Filter>源文件\Function</Filter>
+    </ClCompile>
+    <ClCompile Include="ShowHideWindow.cpp">
+      <Filter>源文件\Function</Filter>
+    </ClCompile>
+    <ClCompile Include="MuteOnOrOff.cpp">
+      <Filter>源文件\Function</Filter>
+    </ClCompile>
+    <ClCompile Include="IsAllHide.cpp">
+      <Filter>源文件\Function</Filter>
+    </ClCompile>
+    <ClCompile Include="ReadAndWrite.cpp">
+      <Filter>源文件\Function</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BossKey.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
