@@ -18,8 +18,8 @@ void ShowHideWindow(wstring processName, wstring className)
             for (const WindowInfo& window : windowsvector)
             {
                 ShowWindow(window.hWnd, SW_HIDE);
-                MuteOn(processName);
             }
+            MuteOn(processName);
         }
             break;
         case 0:
@@ -32,9 +32,9 @@ void ShowHideWindow(wstring processName, wstring className)
                 if (!window.isHide)
                 {
                     ShowWindow(window.hWnd, SW_HIDE);
-                    MuteOn(processName);
                 }
             }
+            MuteOn(processName);
         }
             break;
         case 1:
@@ -44,16 +44,26 @@ void ShowHideWindow(wstring processName, wstring className)
 
             for (const WindowInfo& window : windowsvector)
             {
-                if (window.isMaximized)
+                if (window.title.compare(L"画中画") == 1)
                 {
-                    ShowWindow(window.hWnd, SW_MAXIMIZE);
+                    if (!window.isHide)
+                    {
+                        ShowWindow(window.hWnd, SW_SHOW);
+                    }
                 }
                 else
                 {
-                    ShowWindow(window.hWnd, SW_SHOW);
+                    if (window.isMaximized)
+                    {
+                        ShowWindow(window.hWnd, SW_MAXIMIZE);
+                    }
+                    else
+                    {
+                        ShowWindow(window.hWnd, SW_SHOW);
+                    }
                 }
-                MuteOff(processName);
             }
+            MuteOff(processName);
         }
             break;
         default:
@@ -62,7 +72,7 @@ void ShowHideWindow(wstring processName, wstring className)
     }
     else 
     {
-        MessageBox(NULL, L"找不到对应窗口", L"错误", MB_ICONERROR | MB_OK);
+        MessageBox(NULL, L"你还没有打开任何窗口哦!!!", L"提示", MB_ICONINFORMATION | MB_OK);
     }
     
 }
