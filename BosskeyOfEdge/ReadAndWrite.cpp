@@ -39,7 +39,7 @@ void SerializeWindowInfoArray(const vector<WindowInfo>& windowInfoArray, string 
     }
     string filePath = folderPath + "\\" + filename;
 
-    ofstream file(filePath, ios::binary);
+    ofstream file(filePath, ios::binary | ios::out);
     if (!file) 
     {
         MessageBox(NULL, L"创建配置文件失败", L"错误", MB_ICONERROR | MB_OK);
@@ -73,7 +73,7 @@ void SerializeWindowInfoArray(const vector<WindowInfo>& windowInfoArray, string 
     file.close();
 }
 
-// 从二进制文件中读取数组
+// 从二进制文件中反序列化读取数组
 vector<WindowInfo> DeserializeWindowInfoArray(string filename) 
 {
     string folderPath = GetUserDocumentsPath() + "BossKeyFile";
@@ -85,7 +85,7 @@ vector<WindowInfo> DeserializeWindowInfoArray(string filename)
 
     vector<WindowInfo> windowInfoArray;
 
-    ifstream file(filePath, ios::binary);
+    ifstream file(filePath, ios::binary | ios::in);
     if (!file) 
     {
         MessageBox(NULL, L"读取配置文件失败", L"错误", MB_ICONERROR | MB_OK);
