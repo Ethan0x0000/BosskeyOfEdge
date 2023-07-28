@@ -57,4 +57,8 @@ bool IsHua(wstring title)
             }
         }
     }
+    else
+    {
+        return false;
+    }
 }
