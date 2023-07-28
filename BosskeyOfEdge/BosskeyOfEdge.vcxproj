@@ -132,10 +132,11 @@
   <ItemGroup>
     <ClCompile Include="GetListByName.cpp" />
     <ClCompile Include="BossKey.cpp" />
-    <ClCompile Include="IsAllHide.cpp" />
-    <ClCompile Include="MuteOnOrOff.cpp" />
+    <ClCompile Include="Judge.cpp" />
+    <ClCompile Include="MuteOnOff.cpp" />
     <ClCompile Include="ReadAndWrite.cpp" />
     <ClCompile Include="ShowHideWindow.cpp" />
+    <ClCompile Include="StringConvert.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BossKey.h" />

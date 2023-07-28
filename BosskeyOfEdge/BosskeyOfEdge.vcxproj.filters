@@ -27,13 +27,16 @@
     <ClCompile Include="ShowHideWindow.cpp">
       <Filter>源文件\Function</Filter>
     </ClCompile>
-    <ClCompile Include="MuteOnOrOff.cpp">
+    <ClCompile Include="MuteOnOff.cpp">
       <Filter>源文件\Function</Filter>
     </ClCompile>
-    <ClCompile Include="IsAllHide.cpp">
+    <ClCompile Include="Judge.cpp">
       <Filter>源文件\Function</Filter>
     </ClCompile>
     <ClCompile Include="ReadAndWrite.cpp">
+      <Filter>源文件\Function</Filter>
+    </ClCompile>
+    <ClCompile Include="StringConvert.cpp">
       <Filter>源文件\Function</Filter>
     </ClCompile>
   </ItemGroup>

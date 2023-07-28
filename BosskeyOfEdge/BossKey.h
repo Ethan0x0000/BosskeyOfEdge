@@ -29,12 +29,16 @@ struct WindowInfo
     bool isMaximized;
 };
 
+string wstring_to_string(const wstring&);
+
 string GetUserDocumentsPath();
 void SerializeWindowInfoArray(const vector<WindowInfo>&, string);
 vector<WindowInfo> DeserializeWindowInfoArray(string);
 
 vector<WindowInfo> GetvectorByName(const wstring&, const wstring&);
+
 int IsAllHide(vector<WindowInfo>);
+bool IsHua(wstring);
 
 
 void MuteOn(wstring);

@@ -4,7 +4,8 @@
 void ShowHideWindow(wstring processName, wstring className)
 {
     vector<WindowInfo> windowsvector = GetvectorByName(processName, className);
-    string fileName = "WindowState.bin";
+
+    string fileName = wstring_to_string(className + L".bin") ;
 
     if (!windowsvector.empty()) 
     {
@@ -42,6 +43,10 @@ void ShowHideWindow(wstring processName, wstring className)
                     {
                         if (windowsvector[i].hWnd == windowsvectorTemp[j].hWnd)
                         {
+                            if (IsHua(windowsvector[i].title))
+                            {
+                                windowsvectorTemp[j] = windowsvector[i];
+                            }
                             break;
                         }
                     }
@@ -75,33 +80,8 @@ void ShowHideWindow(wstring processName, wstring className)
 
             for (const WindowInfo& window : windowsvector)
             {
-                bool isHua = false;
-                if (window.title.length() == 4)
-                {
-                    wstring title = L"画中画";
-                    size_t len1 = window.title.length();
-                    size_t len2 = title.length();
-                    // 外层循环遍历1的所有可能的子串
-                    for (size_t i = 0; i < len1; ++i) 
-                    {
-                        // 内层循环遍历2的所有可能的子串
-                        for (size_t j = 0; j < len2; ++j)
-                        {
-                            size_t len = 0;
-                            // 检查从i开始的1子串是否与从j开始的2子串相同
-                            while (i + len < len1 && j + len < len2 && window.title[i + len] == title[j + len])
-                            {
-                                ++len;
-                            }
-
-                            if (len > 0)
-                            {
-                               isHua = true;
-                            }
-                        }
-                    }
-                }
-                if (isHua)
+                
+                if (IsHua(window.title))
                 {
                     if (!window.isHide)
                     {
