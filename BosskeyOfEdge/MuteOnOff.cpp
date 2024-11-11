@@ -1,14 +1,16 @@
 #include "BossKey.h"
-namespace fs = std::filesystem;
+#include <windows.h>
+#include <filesystem>
+#include <shlwapi.h>
+#include <string>
 
-void MuteOn(wstring processName)
+
+void MuteOn(const std::wstring& processName)
 {
-    if (!fs::exists("nircmd.exe"))
-        return;
     LPCWSTR executableName = L"nircmd.exe";
-    wstring operateName = L"muteappvolume";
-    wstring stateName = L"1";
-    wstring parameters = operateName + L" " + processName + L" " + stateName;
+    std::wstring operateName = L"muteappvolume";
+    std::wstring stateName = L"1";
+    std::wstring parameters = operateName + L" " + processName + L" " + stateName;
     LPCWSTR Parameters = parameters.c_str();
     WCHAR executablePath[MAX_PATH];
     WCHAR programPath[MAX_PATH];
@@ -20,7 +22,7 @@ void MuteOn(wstring processName)
 
     SHELLEXECUTEINFO shellExecuteInfo = { 0 };
     shellExecuteInfo.cbSize = sizeof(SHELLEXECUTEINFO);
-    shellExecuteInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
+    shellExecuteInfo.fMask = SEE_MASK_NOCLOSEPROCESS | SEE_MASK_FLAG_NO_UI; // ½ûÓÃ´íÎóµ¯´°
     shellExecuteInfo.lpVerb = L"open";
     shellExecuteInfo.lpFile = executablePath;
     shellExecuteInfo.lpParameters = Parameters;
@@ -33,14 +35,12 @@ void MuteOn(wstring processName)
     }
 }
 
-void MuteOff(wstring processName)
+void MuteOff(const std::wstring& processName)
 {
-    if (!fs::exists("nircmd.exe"))
-        return;
     LPCWSTR executableName = L"nircmd.exe";
-    wstring operateName = L"muteappvolume";
-    wstring stateName = L"0";
-    wstring parameters = operateName + L" " + processName + L" " + stateName;
+    std::wstring operateName = L"muteappvolume";
+    std::wstring stateName = L"0";
+    std::wstring parameters = operateName + L" " + processName + L" " + stateName;
     LPCWSTR Parameters = parameters.c_str();
     WCHAR executablePath[MAX_PATH];
     WCHAR programPath[MAX_PATH];
@@ -52,7 +52,7 @@ void MuteOff(wstring processName)
 
     SHELLEXECUTEINFO shellExecuteInfo = { 0 };
     shellExecuteInfo.cbSize = sizeof(SHELLEXECUTEINFO);
-    shellExecuteInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
+    shellExecuteInfo.fMask = SEE_MASK_NOCLOSEPROCESS | SEE_MASK_FLAG_NO_UI; // ½ûÓÃ´íÎóµ¯´°
     shellExecuteInfo.lpVerb = L"open";
     shellExecuteInfo.lpFile = executablePath;
     shellExecuteInfo.lpParameters = Parameters;

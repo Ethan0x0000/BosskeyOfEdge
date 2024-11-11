@@ -41,8 +41,8 @@ int IsAllHide(vector<WindowInfo>);
 bool IsHua(wstring);
 
 
-void MuteOn(wstring);
-void MuteOff(wstring);
+void MuteOn(const std::wstring& processName);
+void MuteOff(const std::wstring& processName);
 
 
 void ShowHideWindow(wstring, wstring);
